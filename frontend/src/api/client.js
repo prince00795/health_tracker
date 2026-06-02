@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-//const API_URL = "https://fitai-backend-8v70.onrender.com/api";
-const API_URL = "http://localhost:5001/api";
+
+const API_URL = "https://health-tracker-tp6f.onrender.com/api";
 
 export const registerUser = (username, email, password) => axios.post(`${API_URL}/register`, { username, email, password });
 export const loginUser = (email, password) => axios.post(`${API_URL}/login`, { email, password });
