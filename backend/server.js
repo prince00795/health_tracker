@@ -6,9 +6,12 @@ const apiRoutes = require('./routes/api');
 
 const app = express();
 
-// Updated CORS Policy to explicitly allow your deployed frontend
+// Updated CORS Policy to explicitly allow your actual deployed Vercel frontend
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://fitai-ivd5.onrender.com'],
+  origin: [
+    'http://localhost:5173', 
+    'https://health-tracker-xi-seven.vercel.app' // Tumhara naya live link
+  ],
   credentials: true
 }));
 
