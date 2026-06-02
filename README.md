@@ -1,58 +1,175 @@
-# fitAi
-# 🛠️ FitAI - Comprehensive Tech Stack Documentation // LIVE LINK : https://fitai-ivd5.onrender.com
+<div align="center">
 
-This document provides an in-depth breakdown of the technologies, frameworks, and tools used to architect and develop **FitAI**, a highly responsive and scalable full-stack web application.
+<h1>HealthTracker</h1>
 
----
+<strong>AI-Powered Fitness & Health Tracking Platform</strong>
 
-## 💻 Frontend Ecosystem (Client-Side)
+<br/><br/>
 
-The frontend is designed to be fast, interactive, and visually stunning, providing users with a seamless experience across all devices.
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](#)
+[![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](#)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](#)
+[![Gemini AI](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)](#)
 
-* **React.js:** The core JavaScript library used for building the user interface. It allows us to build reusable components (like `Navbar`, `ProfileForm`, `PlanDisplay`) and manage complex state efficiently.
-* **React Router DOM:** Handles client-side routing, enabling a Single Page Application (SPA) experience. It allows seamless navigation between pages (Home, Login, Dashboard) without reloading the browser.
-* **Tailwind CSS:** A utility-first CSS framework used for rapid UI development. It powers the glassmorphism effects, responsive grids, gradient animations, and the seamless Dark/Light mode toggling.
-* **Axios:** A promise-based HTTP client used to make asynchronous API requests to our backend securely and cleanly.
-* **Lucide React:** A beautifully crafted, highly customizable open-source icon library. Used to enhance the visual hierarchy and UX (e.g., `Dumbbell`, `Activity`, `Sun`, `Moon` icons).
+> A full-stack MERN application that leverages Google's Gemini AI to generate highly personalized fitness routines and diet plans, complete with progress tracking and a resilient backend architecture.
 
----
-
-## ⚙️ Backend Ecosystem (Server-Side)
-
-The backend acts as the logic engine of FitAI, securely processing user data, handling authentication, and generating AI-driven fitness plans.
-
-* **Node.js:** A JavaScript runtime environment that executes server-side code, allowing us to use JavaScript for both the frontend and the backend.
-* **Express.js:** A fast, minimalist web framework for Node.js. It is used to set up the RESTful API endpoints (`/api/login`, `/api/generate-plan`), handle HTTP requests, and manage middleware.
-* **CORS (Cross-Origin Resource Sharing):** A Node.js package used as middleware to securely allow our frontend domain to communicate with our separate backend domain.
-* **Dotenv:** A zero-dependency module that loads environment variables from a `.env` file into `process.env`, keeping sensitive data like database URIs and secret keys secure.
+</div>
 
 ---
 
-## 🗄️ Database Architecture
+# 🚀 Overview
 
-FitAI requires a highly flexible database to store user profiles, dynamic biometric data, and complex generated fitness plans.
+HealthTracker is a comprehensive fitness application designed to help users achieve their health goals. By integrating Google's Gemini AI, the platform generates dynamic workout schedules and diet charts based on individual user profiles. It features a highly resilient backend that gracefully handles API rate limits, interactive charts for progress tracking, and a secure admin dashboard.
 
-* **MongoDB Atlas:** A fully managed cloud NoSQL database service. It stores user data in flexible, JSON-like documents, making it perfect for the dynamic data structures required for adaptive fitness tracking.
-* **Mongoose:** An elegant Object Data Modeling (ODM) library for MongoDB and Node.js. It provides a straight-forward, schema-based solution to model application data, enforce strict validation rules, and manage relationships between data entities.
+# ✨ Key Features
+
+## 🧠 Personalized AI Plans
+
+- Dynamic generation of structured workout routines.
+- AI-powered calorie-matched diet plans.
+- Supports Gym, Home Workout, Yoga, and more.
+- Uses Gemini AI JSON output for reliable data storage.
+
+## 📈 Progress Tracking & Analytics
+
+- Daily weight tracking.
+- Calorie intake monitoring.
+- Sleep tracking.
+- Water consumption tracking.
+- Interactive charts using Recharts.
+
+## 👑 Admin Dashboard
+
+- Role-Based Access Control (RBAC).
+- Admin-only protected routes.
+- User statistics and analytics.
+- Generated plan monitoring.
+
+## 💬 Integrated AI Assistant
+
+- Built-in fitness chatbot.
+- Context-aware responses.
+- Personalized fitness and nutrition guidance.
+
+## 🛡️ Resilient Backend Architecture
+
+- Custom asynchronous retry logic.
+- Handles API rate limits (429) and server overloads (503).
+- Prevents backend crashes with graceful error handling.
+- Provides clean user feedback during failures.
+
+
+# 🛠️ Technology Stack
+
+### Frontend
+- React.js
+- Tailwind CSS
+- React Router DOM
+- Recharts
+- Lucide React
+
+### Backend
+- Node.js
+- Express.js
+
+### Database
+- MongoDB
+- Mongoose
+
+### AI Integration
+- Google Gemini 2.5 Flash
+- Google Generative AI SDK
+
+### Security
+- Bcrypt.js
+- JWT Authentication
 
 ---
 
-## 🚀 Deployment & DevOps
+# 💻 Local Setup & Installation
 
-To ensure FitAI is highly available and scalable, modern cloud deployment platforms are utilized.
+## 1. Prerequisites
 
-* **Render:** A unified cloud hosting platform used to deploy both the frontend and backend.
-    * **Frontend:** Deployed as a **Static Site**, utilizing rewrite rules to properly handle React Router's SPA routing.
-    * **Backend:** Deployed as a **Web Service**, running the Node.js/Express server continuously in the cloud.
-* **Git & GitHub:** Used for source code management, version control, and triggering automatic continuous integration/continuous deployment (CI/CD) pipelines on Render.
+- Node.js (v18+)
+- MongoDB Atlas Account
+- Gemini API Key
+
+## 2. Clone Repository
+
+```bash
+git clone https://github.com/prince00795/health_tracker.git
+cd health_tracker
+```
+
+## 3. Install Dependencies
+
+### Backend
+
+```bash
+cd backend
+npm install
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+## 4. Environment Variables
+
+Create a `.env` file inside the backend folder:
+
+```env
+PORT=5001
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+## 5. Run Application
+
+### Backend
+
+```bash
+npm run server
+```
+
+### Frontend
+
+```bash
+npm start
+```
 
 ---
 
-## 🔄 Data Flow Architecture
+# 📊 Core Functionalities
 
-1.  **User Interaction:** The user interacts with the React UI (e.g., submits the login form).
-2.  **API Request:** Axios sends an HTTP POST request containing the data to the Express backend.
-3.  **Processing & Validation:** Express routes the request, and Mongoose validates the incoming data against defined schemas.
-4.  **Database Transaction:** The backend securely reads from or writes to the MongoDB Atlas cluster.
-5.  **Response:** The backend sends a JSON response back to the client.
-6.  **State Update:** React updates the UI dynamically based on the received data (e.g., logging the user in and redirecting to the Dashboard).
+- User Authentication
+- AI Workout Plan Generation
+- AI Diet Plan Generation
+- Progress Tracking
+- Analytics Dashboard
+- Admin Panel
+- Fitness Chat Assistant
+- Secure Password Storage
+
+---
+
+# 🔮 Future Improvements
+
+- Workout Reminder Notifications
+- Mobile Application
+- Wearable Device Integration
+- Social Fitness Community
+- Advanced Health Analytics
+
+---
+
+# 👨‍💻 Author
+
+Prince Raj
+
+Built with ❤️ using the MERN Stack and Google Gemini AI.

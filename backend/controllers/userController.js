@@ -5,6 +5,54 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 // Initialize Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// =========================================================================
+// 🚀 PRODUCTION-READY AI RETRY & RATE-LIMIT COOLDOWN ENGINE
+// =========================================================================
+const generateAIContentWithRetry = async (prompt) => {
+  // Sticking strictly to the verified stable model name
+  const modelName = "gemini-2.5-flash"; 
+  const maxRetries = 2;
+  const delay = (ms) => new Promise(res => setTimeout(res, ms));
+
+  let attempts = 0;
+  while (attempts < maxRetries) {
+    try {
+      console.log(`🤖 [AI Engine] Attempting matrix generation with ${modelName} (Attempt ${attempts + 1})...`);
+      
+      const model = genAI.getGenerativeModel({ 
+          model: modelName,
+          generationConfig: { responseMimeType: "application/json" } 
+      });
+      
+      const result = await model.generateContent(prompt);
+      const responseText = result.response.text();
+      return responseText; // Success returning raw JSON string
+
+    } catch (error) {
+      attempts++;
+      const errorMsg = error.message || "";
+      
+      // Checking for both standard server spikes (503) and free quota blocks (429)
+      const isRateLimited = errorMsg.includes('429') || JSON.stringify(error).includes('429');
+      const is503Overloaded = errorMsg.includes('503') || JSON.stringify(error).includes('503');
+      
+      if ((isRateLimited || is503Overloaded) && attempts < maxRetries) {
+        console.warn(`⚠️ [AI Engine] Rate limit or high traffic hit (429/503). Cooling down system for 4 seconds before retry...`);
+        await delay(4000); 
+      } else if (isRateLimited) {
+        // Explicit structural error if retries exhaust on quota limit windows
+        throw new Error("QUOTA_EXCEEDED");
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error("System pipeline exhausted.");
+};
+
+// =========================================================================
+// CORE METRICS UTILITY
+// =========================================================================
 const calculateTargetCalories = (weight, height, age, gender, activityLevel, goal) => {
     const w = weight || 70;
     const h = height || 170;
@@ -40,6 +88,9 @@ const calculateTargetCalories = (weight, height, age, gender, activityLevel, goa
     return Math.round(tdee) || 2000; 
 };
 
+// =========================================================================
+// CONTROLLER EXPORTS
+// =========================================================================
 exports.registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -99,9 +150,6 @@ exports.logProgress = async (req, res) => {
   }
 };
 
-// FEATURE UPGRADE: Smart Schedule added to the generation prompt
-// Apne current userController.js mein sirf generatePlan wala function is se replace kar do:
-
 exports.generatePlan = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -141,24 +189,25 @@ exports.generatePlan = async (req, res) => {
       ]
     }`;
 
-    // NATIVE JSON MODE ACTIVATED
-    const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.5-flash",
-        generationConfig: { responseMimeType: "application/json" } 
-    });
-    
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    const responseText = await generateAIContentWithRetry(prompt);
     
     user.aiPlan = JSON.parse(responseText);
     await user.save();
     res.json(user);
   } catch (error) { 
-    console.error("❌ Backend Error in generatePlan:", error.message);
-    res.status(500).json({ error: "Failed to generate AI plan. Please try again." }); 
+    console.error("❌ Final Error execution in generatePlan:", error.message);
+    
+    // Custom error validation mapping for rich UI responses
+    if (error.message === "QUOTA_EXCEEDED") {
+      return res.status(429).json({ 
+        error: "Google Free Tier limit reached. Please wait 45 seconds for the system quota to cool down before clicking again!" 
+      });
+    }
+    
+    res.status(500).json({ error: "Failed to generate AI plan. Please try initializing again." }); 
   }
 };
-// NEW FEATURE: AI Chat Assistant
+
 exports.chatAssistant = async (req, res) => {
   try {
     const { userId, message } = req.body;
