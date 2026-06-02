@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dumbbell, Utensils, Activity, Bot, ArrowRight, Heart, Target, ChevronRight, Moon, Sun, User, LogOut, Zap, LineChart } from 'lucide-react';
+import { Dumbbell, Utensils, Activity, Bot, ArrowRight, Target, ChevronRight, Moon, Sun, User, LogOut, Zap, LineChart, Crown, Check, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Home({ onNavigate, isDarkMode, toggleTheme, user, onLogout }) {
@@ -46,6 +46,55 @@ export default function Home({ onNavigate, isDarkMode, toggleTheme, user, onLogo
           </Link>
 
           <div className="flex items-center gap-3 sm:gap-4">
+             
+             {/* PREMIUM FEATURES HOVER/TAP DROPDOWN PANEL */}
+             <div className="relative group mx-2">
+               <button className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-slate-600 dark:text-neutral-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors py-2 focus:outline-none">
+                 <Crown size={15} className="text-amber-500 animate-pulse" /> 
+                 <span>Premium tier</span>
+               </button>
+               
+               {/* Dropdown Content Box */}
+               <div className="absolute right-1/2 translate-x-1/2 sm:right-0 sm:translate-x-0 top-full hidden group-hover:block w-[320px] sm:w-[480px] bg-white dark:bg-neutral-900 border-2 border-slate-200 dark:border-neutral-800 shadow-2xl p-5 sm:p-6 z-50 mt-1 transition-all">
+                  <div className="text-center border-b border-slate-100 dark:border-neutral-800 pb-3 mb-4">
+                    <p className="text-[10px] font-black tracking-widest text-amber-500 uppercase">System Tiers Ecosystem</p>
+                    <h4 className="text-base font-black uppercase tracking-tight text-slate-900 dark:text-white">Compare Access Levels</h4>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Free Features */}
+                    <div className="space-y-2.5">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-neutral-500 uppercase tracking-wider border-b border-slate-100 dark:border-neutral-800 pb-1">Core Access (Free)</p>
+                      <ul className="space-y-1.5 text-[11px] font-bold uppercase text-slate-600 dark:text-neutral-400">
+                        <li className="flex items-center gap-1.5"><Check size={12} className="text-green-500 shrink-0" /> Dynamic Fitness Engine</li>
+                        <li className="flex items-center gap-1.5"><Check size={12} className="text-green-500 shrink-0" /> Macro Diet Matrix</li>
+                        <li className="flex items-center gap-1.5"><Check size={12} className="text-green-500 shrink-0" /> 7-Day Performance Charts</li>
+                        <li className="flex items-center gap-1.5"><Check size={12} className="text-green-500 shrink-0" /> 24/7 AI Coach Chat</li>
+                      </ul>
+                    </div>
+                    
+                    {/* Premium Upgrades */}
+                    <div className="space-y-2.5 bg-amber-500/5 dark:bg-amber-500/10 p-3 border border-amber-500/20">
+                      <p className="text-[10px] font-black text-amber-600 dark:text-amber-500 uppercase tracking-wider border-b border-amber-500/20 pb-1">Quantum Tier (Premium)</p>
+                      <ul className="space-y-1.5 text-[11px] font-bold uppercase text-slate-700 dark:text-neutral-300">
+                        <li className="flex items-center gap-1.5"><Lock size={11} className="text-amber-500 shrink-0" /> AI Body Analysis (Photos)</li>
+                        <li className="flex items-center gap-1.5"><Lock size={11} className="text-amber-500 shrink-0" /> Meal Image Calorie Detection</li>
+                        <li className="flex items-center gap-1.5"><Lock size={11} className="text-amber-500 shrink-0" /> Voice AI Trainer</li>
+                        <li className="flex items-center gap-1.5"><Lock size={11} className="text-amber-500 shrink-0" /> AI Shopping Protocols</li>
+                        <li className="flex items-center gap-1.5"><Lock size={11} className="text-amber-500 shrink-0" /> Smart Wearable Sync</li>
+                        <li className="flex items-center gap-1.5"><Lock size={11} className="text-amber-500 shrink-0" /> Live Posture Correction</li>
+                        <li className="flex items-center gap-1.5"><Lock size={11} className="text-amber-500 shrink-0" /> AI Habit Prediction</li>
+                        <li className="flex items-center gap-1.5"><Lock size={11} className="text-amber-500 shrink-0" /> Mood-Based Nutrition</li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <button onClick={() => onNavigate('login?mode=signup')} className="w-full bg-amber-500 hover:bg-amber-600 text-neutral-950 text-xs font-black uppercase tracking-widest py-3 mt-4 text-center transition-colors">
+                    Subscribe To Upgrade
+                  </button>
+               </div>
+             </div>
+
              <button 
                 onClick={toggleTheme}
                 className="p-2.5 text-slate-500 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-all rounded-full focus:outline-none"
@@ -74,9 +123,9 @@ export default function Home({ onNavigate, isDarkMode, toggleTheme, user, onLogo
                  >
                    Log in
                  </button>
-                 {/* FIXED: Redirects strictly to login/signup interface instead of empty onboarding route */}
+                 {/* FIXED: Form targeted directly to query param signup track */}
                  <button 
-                    onClick={() => onNavigate('login')}
+                    onClick={() => onNavigate('login?mode=signup')}
                     className="bg-red-600 hover:bg-red-700 text-white font-black py-3 px-4 sm:px-6 uppercase tracking-widest transition-all active:scale-95 text-xs flex items-center gap-2 shadow-lg"
                  >
                    <Zap size={14} /> Get Started
@@ -84,7 +133,6 @@ export default function Home({ onNavigate, isDarkMode, toggleTheme, user, onLogo
                </>
              )}
 
-             {/* ADMIN PORTAL NAVBAR (TOP RIGHT) */}
              <div className="h-6 w-px bg-slate-300 dark:bg-neutral-700 hidden sm:block mx-1"></div>
              <button 
                onClick={() => onNavigate('admin')}
@@ -98,8 +146,6 @@ export default function Home({ onNavigate, isDarkMode, toggleTheme, user, onLogo
 
       {/* Hero Section */}
       <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-24 md:py-32 relative overflow-hidden bg-slate-50 dark:bg-neutral-950 transition-colors">
-        
-        {/* Aggressive Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCAwLCAwLCAwLjA1KSIvPjwvc3ZnPg==')] opacity-40 dark:opacity-50"></div>
 
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-500 font-black text-[10px] uppercase tracking-widest mb-8 z-10 shadow-sm">
@@ -116,8 +162,9 @@ export default function Home({ onNavigate, isDarkMode, toggleTheme, user, onLogo
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 z-10 w-full sm:w-auto">
+           {/* FIXED: Generates plan call targeted directly to signup parameters for non-registered users */}
            <button 
-             onClick={() => onNavigate('dashboard')} 
+             onClick={() => onNavigate(user ? 'dashboard' : 'login?mode=signup')} 
              className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-black text-sm uppercase tracking-widest py-5 px-10 transition-all flex items-center justify-center gap-3 group border-2 border-red-600 shadow-xl"
            >
              {user ? "ACCESS DASHBOARD" : "GENERATE PLAN"}
@@ -180,7 +227,7 @@ export default function Home({ onNavigate, isDarkMode, toggleTheme, user, onLogo
           
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-slate-500 dark:text-neutral-600 text-[10px] font-black uppercase tracking-widest">
-              ENGINEERED FOR <Heart size={12} className="text-red-600 mx-1" /> EXCELLENCE. &copy; {new Date().getFullYear()}
+              ENGINEERED FOR EXCELLENCE. &copy; {new Date().getFullYear()}
             </div>
           </div>
         </div>
