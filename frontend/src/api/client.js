@@ -9,3 +9,4 @@ export const saveUserProfile = (userId, profileData) => axios.post(`${API_URL}/p
 export const generateAIPlan = (userId) => axios.post(`${API_URL}/generate-plan`, { userId });
 export const logUserProgress = (userId, logData) => axios.post(`${API_URL}/log-progress`, { userId, logData });
 export const sendChatMessage = (userId, message) => axios.post(`${API_URL}/chat`, { userId, message });
+export const getAdminData = (adminId) => axios.post(`${API_URL}/admin/dashboard`, { adminId });

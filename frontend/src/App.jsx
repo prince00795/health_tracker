@@ -9,8 +9,8 @@ import ProgressTracker from './components/ProgressTracker.jsx';
 import Navbar from './components/Navbar.jsx';
 import Home from './components/Home.jsx';
 import ChatWidget from './components/ChatWidget.jsx';
+import AdminDashboard from './components/AdminDashboard.jsx';
 
-// Ek helper component banate hain Dashboard ke andar routing manage karne ke liye
 function DashboardContent({ user, setUser, loading, setLoading, isDarkMode, toggleTheme }) {
   const [activeTab, setActiveTab] = useState('plan');
   
@@ -26,7 +26,7 @@ function DashboardContent({ user, setUser, loading, setLoading, isDarkMode, togg
   };
 
   return (
-    <div className={`min-h-screen transition-colors ${isDarkMode ? 'dark bg-neutral-950 text-white' : 'bg-neutral-900 text-white'} p-4 md:p-8 pb-20`}>
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'dark bg-neutral-950 text-white' : 'bg-slate-50 text-slate-900'} p-4 md:p-8 pb-20`}>
       <div className="max-w-5xl mx-auto relative">
         
         <Navbar 
@@ -36,20 +36,20 @@ function DashboardContent({ user, setUser, loading, setLoading, isDarkMode, togg
           onLogout={() => setUser(null)} 
         />
 
-        {/* Action Tabs - Red/Black Theme */}
+        {/* Action Tabs */}
         {user.aiPlan?.workoutPlan && (
           <div className="flex gap-4 mb-8">
             <button 
               onClick={() => setActiveTab('plan')} 
-              className={`flex items-center gap-2 px-6 py-3 font-black uppercase tracking-widest transition-all border-2 ${activeTab === 'plan' ? 'bg-red-600 border-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]' : 'bg-neutral-950 border-neutral-800 text-neutral-500 hover:border-neutral-600'}`}
+              className={`flex items-center gap-2 px-6 py-3 font-bold uppercase tracking-widest transition-all border-2 ${activeTab === 'plan' ? 'bg-red-600 border-red-600 text-white shadow-lg' : 'bg-white dark:bg-neutral-950 border-slate-300 dark:border-neutral-800 text-slate-500 hover:border-slate-400 dark:hover:border-neutral-600'}`}
             >
-              <Target size={20} /> PROTOCOL
+              <Target size={20} /> My Plan
             </button>
             <button 
               onClick={() => setActiveTab('progress')} 
-              className={`flex items-center gap-2 px-6 py-3 font-black uppercase tracking-widest transition-all border-2 ${activeTab === 'progress' ? 'bg-red-600 border-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]' : 'bg-neutral-950 border-neutral-800 text-neutral-500 hover:border-neutral-600'}`}
+              className={`flex items-center gap-2 px-6 py-3 font-bold uppercase tracking-widest transition-all border-2 ${activeTab === 'progress' ? 'bg-red-600 border-red-600 text-white shadow-lg' : 'bg-white dark:bg-neutral-950 border-slate-300 dark:border-neutral-800 text-slate-500 hover:border-slate-400 dark:hover:border-neutral-600'}`}
             >
-              <TrendingUp size={20} /> TELEMETRY
+              <TrendingUp size={20} /> Daily Track
             </button>
           </div>
         )}
@@ -60,41 +60,37 @@ function DashboardContent({ user, setUser, loading, setLoading, isDarkMode, togg
             <>
               {!user.aiPlan?.workoutPlan ? (
                 <>
-                  <ProfileForm user={user} onProfileSaved={setUser} />
+                  <ProfileForm user={user} onProfileSaved={setUser} isDarkMode={isDarkMode} />
                   <button 
                     onClick={handleGeneratePlan} 
                     disabled={loading} 
-                    className="w-full mt-4 bg-red-600 hover:bg-red-700 transition-colors text-white p-5 font-black text-xl uppercase tracking-widest active:scale-[0.98] disabled:opacity-50 border-2 border-transparent disabled:border-neutral-800 disabled:bg-neutral-900 flex items-center justify-center gap-3"
+                    className="w-full mt-4 bg-red-600 hover:bg-red-700 transition-colors text-white p-5 font-black text-xl uppercase tracking-widest active:scale-[0.98] disabled:opacity-50 border-2 border-transparent disabled:border-slate-300 dark:disabled:border-neutral-800 disabled:bg-slate-200 dark:disabled:bg-neutral-900 flex items-center justify-center gap-3 disabled:text-slate-500"
                   >
-                    {loading ? "CALIBRATING AI PROTOCOL..." : "GENERATE AI PROTOCOL"}
+                    {loading ? "Creating Your Plan..." : "Generate Plan"}
                   </button>
                 </>
               ) : (
-                <PlanDisplay aiPlan={user.aiPlan} />
+                // YAHAN CHANGE HUA HAI: user aur setUser pass kiya gaya hai
+                <PlanDisplay user={user} setUser={setUser} aiPlan={user.aiPlan} isDarkMode={isDarkMode} />
               )}
             </>
           ) : (
-            <ProgressTracker user={user} onProgressUpdated={setUser} />
+             <ProgressTracker user={user} onProgressUpdated={setUser} isDarkMode={isDarkMode} />
           )}
         </div>
 
-        {/* AI Chat Assistant Widget */}
-        <ChatWidget user={user} />
+        <ChatWidget user={user} isDarkMode={isDarkMode} />
         
       </div>
     </div>
   );
 }
 
-// App component ko Router wrap karega isliye iska actual logic ek inner component mein rakhte hain
 function AppRoutes() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem('theme') === 'dark';
-  });
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
 
   useEffect(() => {
     if (isDarkMode) {
@@ -108,85 +104,33 @@ function AppRoutes() {
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
+  // ROLE-BASED REDIRECT LOGIC ADDED HERE
   const handleLoginSuccess = (userData) => {
     setUser(userData);
-    navigate('/dashboard');
+    if (userData.role === 'admin') {
+      navigate('/admin');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    navigate('/home');
-  };
-
-  // Helper handler logic for when a user tries to interact from Home
-  const handleNavigateFromHome = (action) => {
-      // If user is already logged in, any major action redirects them to dashboard
-      if (user && (action === 'login' || action === 'onboarding')) {
-          navigate('/dashboard');
-      } else {
-          navigate(`/${action}`);
-      }
+  const handleNavigate = (action) => {
+    if (action === 'admin') {
+      navigate(user && user.role === 'admin' ? '/admin' : '/login');
+    } else {
+      navigate(user && action !== 'login' ? '/dashboard' : `/${action}`);
+    }
   };
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/home" replace />} />
-      
-      {/* Home Route - pass user, handleNavigateFromHome, and handleLogout */}
-      <Route path="/home" element={<Home onNavigate={handleNavigateFromHome} isDarkMode={isDarkMode} toggleTheme={toggleTheme} user={user} onLogout={handleLogout} />} />
-      
-      <Route path="/login" element={
-        // Agar user pehle se login hai, toh usko login page pe kyu aane dena?
-        user ? (
-            <Navigate to="/dashboard" replace />
-        ) : (
-            <div className={isDarkMode ? 'dark' : ''}>
-            <button 
-                onClick={() => navigate('/home')} 
-                className="fixed top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md rounded-full shadow-lg text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-bold text-sm"
-            >
-                <ArrowLeft size={16} /> Back to Home
-            </button>
-            <Login onLoginSuccess={handleLoginSuccess} />
-            </div>
-        )
-      } />
-
-      {/* Onboarding route redirects to Login if not authenticated, or Dashboard if authenticated.
-          This ensures "Get Started" behaves like "Login/Signup" first. */}
-      <Route path="/onboarding" element={
-          user ? (
-              <Navigate to="/dashboard" replace />
-          ) : (
-              <Navigate to="/login" replace />
-          )
-      } />
-
-      <Route path="/dashboard" element={
-        user ? (
-          <DashboardContent 
-            user={user} 
-            setUser={setUser} 
-            loading={loading} 
-            setLoading={setLoading}
-            isDarkMode={isDarkMode}
-            toggleTheme={toggleTheme}
-          />
-        ) : (
-          <Navigate to="/login" replace />
-        )
-      } />
-      
-      {/* Fallback route */}
-      <Route path="*" element={<Navigate to="/home" replace />} />
+      <Route path="/home" element={<Home onNavigate={handleNavigate} isDarkMode={isDarkMode} toggleTheme={toggleTheme} user={user} onLogout={() => setUser(null)} />} />
+      <Route path="/login" element={user ? <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace /> : <Login onLoginSuccess={handleLoginSuccess} />} />
+      <Route path="/dashboard" element={user ? <DashboardContent user={user} setUser={setUser} loading={loading} setLoading={setLoading} isDarkMode={isDarkMode} toggleTheme={toggleTheme} /> : <Navigate to="/login" replace />} />
+      <Route path="/admin" element={user && user.role === 'admin' ? <AdminDashboard user={user} onNavigate={navigate} isDarkMode={isDarkMode} /> : <Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
 
-export default function App() {
-  return (
-    <Router>
-      <AppRoutes />
-    </Router>
-  );
-}
+export default function App() { return <Router><AppRoutes /></Router>; }

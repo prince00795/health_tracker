@@ -100,54 +100,64 @@ exports.logProgress = async (req, res) => {
 };
 
 // FEATURE UPGRADE: Smart Schedule added to the generation prompt
+// Apne current userController.js mein sirf generatePlan wala function is se replace kar do:
+
 exports.generatePlan = async (req, res) => {
   try {
     const { userId } = req.body;
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user || !user.profile) return res.status(404).json({ error: "User profile incomplete" });
 
-    const calculatedCalories = calculateTargetCalories(
-        user.weight, user.height, user.age, user.gender, user.activityLevel, user.goal
-    );
+    const p = user.profile;
+    const calculatedCalories = calculateTargetCalories(p.weight, p.height, p.age, p.gender, p.activityLevel, p.goal);
 
-    const prompt = `You are an expert AI fitness coach. 
-    Create a highly personalized fitness, diet, and lifestyle plan.
-    User Profile: Goal: ${user.goal}, Diet: ${user.dietaryPreference}, Age: ${user.age}, Weight: ${user.weight}kg, Activity: ${user.activityLevel}, Target Calories: ${calculatedCalories} kcal.
+    const prompt = `You are an elite AI fitness and nutrition coach. Create a customized protocol.
     
-    CRITICAL RULES:
-    1. Respond STRICTLY with a valid JSON object matching this exact schema. Do NOT wrap in markdown.
+    User Profile: 
+    - Goal: ${p.goal}
+    - Target Calories: ${calculatedCalories} kcal (Diet: ${p.dietaryPreference})
+    - Activity: ${p.activityLevel}, Equipment/Location: ${p.workoutLocation}
+    - Medical/Allergies: ${p.medicalConditions || 'None'}, ${p.allergies || 'None'}
+    
+    CRITICAL PROTOCOL: PREFERRED EXERCISE STYLE IS "${p.preferredExercise}".
+    - IF style is "Yoga", provide Yoga Asanas. Use "1" for sets and "Duration (e.g., 60s)" for reps.
+    - IF style is "HIIT" or "Cardio", provide high-intensity intervals. Use "Time" for sets/reps if needed.
+    - DO NOT give gym weightlifting exercises if Yoga or Cardio is selected.
+
+    Output STRICTLY as a valid JSON object matching this schema exactly:
     {
       "workoutPlan": {
-        "weeklySplit": "6-Day Split",
+        "weeklySplit": "String",
         "routine": [ 
           { "day": "String", "focus": "String", "exercises": [ { "name": "String", "sets": "String", "reps": "String" } ] }
         ]
       },
       "dietPlan": {
         "targetCalories": ${calculatedCalories},
-        "meals": [ { "mealName": "String", "suggestion": "String", "calories": "Number" } ]
+        "meals": [ { "mealName": "String", "suggestion": "String", "calories": "Number", "alternative": "String" } ]
       },
       "dailySchedule": [
-        { "time": "String (e.g., 06:00 AM)", "activity": "String", "type": "String (e.g., Lifestyle, Meal, Workout)" }
+        { "time": "String", "activity": "String", "type": "String" }
       ]
     }`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    const result = await model.generateContent(prompt);
-    let responseText = result.response.text();
+    // NATIVE JSON MODE ACTIVATED
+    const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",
+        generationConfig: { responseMimeType: "application/json" } 
+    });
     
-    responseText = responseText.replace(/```json/gi, '').replace(/```/gi, '').trim();
-    const aiResponse = JSON.parse(responseText);
-
-    user.aiPlan = aiResponse;
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+    
+    user.aiPlan = JSON.parse(responseText);
     await user.save();
     res.json(user);
   } catch (error) { 
-    console.error("AI Error:", error);
-    res.status(500).json({ error: "Failed to generate AI plan" }); 
+    console.error("❌ Backend Error in generatePlan:", error.message);
+    res.status(500).json({ error: "Failed to generate AI plan. Please try again." }); 
   }
 };
-
 // NEW FEATURE: AI Chat Assistant
 exports.chatAssistant = async (req, res) => {
   try {

@@ -5,13 +5,16 @@ const ProgressSchema = new mongoose.Schema({
   weight: Number,
   waterIntake: Number,
   workoutCompleted: { type: Boolean, default: false },
-  caloriesConsumed: Number
+  caloriesConsumed: Number,
+  sleepHours: Number,   
+  energyLevel: String   
 });
 
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: { type: String, default: 'user', enum: ['user', 'admin'] }, // <--- NAYA FIELD ADMIN KE LIYE
   profile: {
     age: Number,
     gender: String,
@@ -26,10 +29,12 @@ const UserSchema = new mongoose.Schema({
     equipment: String,
     experienceLevel: String,
     schedule: String,
+    preferredExercise: { type: String, default: 'Strength training' } 
   },
   aiPlan: {
     workoutPlan: Object,
-    dietPlan: Object
+    dietPlan: Object,
+    dailySchedule: Array
   },
   progressLogs: [ProgressSchema]
 }, { timestamps: true });
